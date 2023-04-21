@@ -6,23 +6,55 @@ import './App.css';
 function App() {
   const [movies,setMovies] = useState([]);
   const [isLoading,setIsLoading] = useState(false);
+  const [error,setError] = useState(null);
 
   async function fetchMovies (){
     setIsLoading(true)
-    const response = await fetch('https://swapi.dev/api/films')
-    const data = await response.json();
-    console.log(data)
-    const transformedMovies = data.results.map((moviesData)=> {
-          return {
-            id:moviesData.episode_id,
-            title:moviesData.title,
-            openingText:moviesData.opening_crawl,
-            releaseDate:moviesData.release_date
-          };
-        })
-        setMovies(transformedMovies)
-        setIsLoading(false)
+    setError(null);
+    try{
+      const response = await fetch('https://swapi.dev/api/film/')
+      if(!response.ok){
+        throw new Error('Something went Wrong ... RETRYING')
       }
+      const data = await response.json();
+      const transformedMovies = data.results.map((moviesData)=> {
+            return {
+              id:moviesData.episode_id,
+              title:moviesData.title,
+              openingText:moviesData.opening_crawl,
+              releaseDate:moviesData.release_date
+            };
+          })
+          setMovies(transformedMovies) 
+      }catch(error){
+        setError(error.message)
+      }
+      setIsLoading(false) 
+}
+let content = <p>Found No Movies.</p>;
+let ers = <div> {setInterval(async () =>{
+  const x = await fetch('https://swapi.dev/api/films/')
+  const dt = await x.json();
+  const fetchedMovies = dt.results.map((moviesdt)=>{
+    return {
+      id:moviesdt.episode_id,
+      title:moviesdt.title,
+      openingText:moviesdt.opening_crawl,
+      releaseDate:moviesdt.release_date
+    };
+  })
+  setMovies(fetchedMovies) 
+},5000)}{<button >Cancel Retrying</button>}</div>
+
+if(error){
+  content = <p>{error}{ers}</p>
+}
+if(movies.length>0){
+  content = <MoviesList movies={movies} />
+}
+if(isLoading){
+  content=<p>Loading....</p>
+}
 
   return (
     <React.Fragment>
@@ -30,8 +62,7 @@ function App() {
         <button onClick={fetchMovies} >Fetch Movies</button>
       </section>
       <section>
-        {!isLoading && <MoviesList movies={movies} />}
-        {isLoading && <p>Loading App.....</p>}
+      {content}
       </section>
     </React.Fragment>
   );
