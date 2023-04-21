@@ -51,10 +51,18 @@ function App() {
     console.log(data)
   }
 
+  async function deleteMovieHandler(id){
+    console.log(id)
+    const response = await fetch(`https://react-http-ad8cd-default-rtdb.asia-southeast1.firebasedatabase.app/movies.json/${id}`,{
+      method:'DELETE',})
+    const data = await response.json();
+    console.log(data)
+  }
+
   let content = <p>Found no movies.</p>;
 
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = <MoviesList movies={movies} deleteMovieHandler={deleteMovieHandler}/>;
   }
 
   if (error) {
