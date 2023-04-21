@@ -57,6 +57,7 @@ function App() {
       method:'DELETE',})
     const data = await response.json();
     console.log(data)
+    setMovies((pre)=>pre.filter((mov)=>mov.id!==id))
   }
 
   let content = <p>Found no movies.</p>;
